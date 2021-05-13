@@ -13,6 +13,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -62,6 +63,14 @@ public class PiGame extends Application{
         circle.setStrokeWidth(2);
         circle.toBack();
         root.getChildren().add(circle);
+
+        Line line1 = new Line(SCR_WIDTH/2-16, SCR_HEIGHT/2, SCR_WIDTH/2+16, SCR_HEIGHT/2);
+        Line line2 = new Line(SCR_WIDTH/2, SCR_HEIGHT/2-16, SCR_WIDTH/2, SCR_HEIGHT/2+16);
+        line1.setStroke(Color.AZURE);
+        line2.setStroke(Color.AZURE);
+        line1.setStrokeWidth(2);
+        line2.setStrokeWidth(2);
+        root.getChildren().addAll(line1, line2);
 
         scene.setCursor(Cursor.DEFAULT);
 
