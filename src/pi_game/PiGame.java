@@ -2,11 +2,13 @@ package pi_game;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -24,6 +26,11 @@ public class PiGame extends Application{
 
     public Canvas canvas;
     public GraphicsContext gc;
+
+    public Image shooter_texture = new Image("pi_game/shooter.png", 32, 32, true, false);
+    public Image background = new Image("pi_game/background.jpg");
+
+    public ImageView shooter_image = new ImageView(shooter_texture);
 
     public ShooterSprite shooter;
 
@@ -45,23 +52,27 @@ public class PiGame extends Application{
 
         canvas = new Canvas(SCR_WIDTH, SCR_HEIGHT);
         root.getChildren().add(canvas);
+        root.getChildren().add(shooter_image);
 
         gc = canvas.getGraphicsContext2D();
 
-        Image drop = new Image("pi_game/drop.png");
         Circle circle = new Circle(SCR_WIDTH/2, SCR_HEIGHT/2, RADIUS);
         circle.setFill(Color.TRANSPARENT);
-        circle.setStroke(Color.BLACK);
+        circle.setStroke(Color.AZURE);
         circle.setStrokeWidth(2);
         circle.toBack();
         root.getChildren().add(circle);
 
-        shooter = new ShooterSprite(drop, SCR_WIDTH/2, SCR_HEIGHT/2, 16, 16);
+        scene.setCursor(Cursor.DEFAULT);
 
-        media_player.setVolume(0.5);
+        shooter = new ShooterSprite(shooter_image, SCR_WIDTH/2, SCR_HEIGHT/2, 32, 32);
+
+        media_player.setVolume(0.2);
         media_player.setAutoPlay(true);
+        media_player.setOnReady(()->media_player.play());
 
         final long start = System.nanoTime();
+
         new AnimationTimer(){
 
             @Override
@@ -71,7 +82,9 @@ public class PiGame extends Application{
                         event -> shooter.update(event.getX(), event.getY())
                 );
                 gc.clearRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
-                shooter.render(gc);
+                gc.drawImage(background, 0, 0);
+                shooter.render();
+
             }
         }.start();
 

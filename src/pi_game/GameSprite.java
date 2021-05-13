@@ -4,23 +4,30 @@ import com.sun.javafx.geom.Vec2d;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.transform.Rotate;
 
 public abstract class GameSprite {
-    private Image texture;
-    private double x, y, width, height;
+    private ImageView texture;
+    private double x, y, width, height, angle;
 
-    public GameSprite(Image texture, double x, double y, double width, double height) {
+    public GameSprite(ImageView texture, double x, double y, double width, double height, double angle) {
         this.texture = texture;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.angle = angle;
     }
 
     public abstract void update(double newX, double newY);
 
-    public void render(GraphicsContext gc){
-        gc.drawImage(texture, x-width/2, y-height/2);
+    public void render(){
+        texture.setScaleX(2);
+        texture.setScaleY(2);
+        texture.setX(x-width/2);
+        texture.setY(y-height/2);
+        texture.setRotate(angle);
     }
 
     public Rectangle2D getBoundingBox(){
@@ -51,4 +58,21 @@ public abstract class GameSprite {
         this.setX(v.x);
         this.setY(v.y);
     }
+
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
 }
