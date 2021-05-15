@@ -31,8 +31,8 @@ public class ShooterSprite extends GameSprite{
 
     public void update(BulletController bulletController, Group group){
         this.shoot_timer++;
-        if(shoot_timer > 20){
-            ImageView bulletImage = new ImageView(PiGame.bullet_texture);
+        if(shoot_timer >= 21){
+            ImageView bulletImage = new ImageView(GameController.bullet_texture);
             group.getChildren().add(bulletImage);
             bulletController.getBulletList().add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 10));
             SHOOT_SOUND.play();

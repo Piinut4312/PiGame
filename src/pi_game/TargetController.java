@@ -24,7 +24,7 @@ public class TargetController {
     public boolean update(Group group, BulletController bulletController){
         spawn_timer++;
         if(spawn_timer >= SPAWN_RATE){
-            ImageView targetImage = new ImageView(PiGame.target_texture);
+            ImageView targetImage = new ImageView(GameController.target_texture);
             group.getChildren().add(targetImage);
             targets.add(new TargetSprite(targetImage, PiGame.SCR_WIDTH/2, PiGame.SCR_HEIGHT/2, 16, 16, 360*rng.nextFloat(), 2));
             spawn_timer = 0;
