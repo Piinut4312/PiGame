@@ -1,6 +1,8 @@
 package pi_game;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.animation.Transition;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -18,6 +20,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.File;
 
@@ -29,8 +32,10 @@ public class GameController {
     private int score;
     private GameState state;
 
+    public static Canvas startCanvas;
     public static Canvas gameplayCanvas;
     public static Canvas endCanvas;
+    public static GraphicsContext startGC;
     public static GraphicsContext gameplayGC;
     public static GraphicsContext endGC;
 
@@ -39,6 +44,8 @@ public class GameController {
     public static ResourceLocation shooter_rl = new ResourceLocation("textures/shooter.png");
     public static ResourceLocation bullet_rl = new ResourceLocation("textures/drop.png");
     public static ResourceLocation target_rl = new ResourceLocation("textures/target.png");
+    public static ResourceLocation title_rl = new ResourceLocation("textures/title.png");
+    public static ResourceLocation click_info_rl = new ResourceLocation("textures/clickInfo.png");
     public static ResourceLocation restart_button_rl = new ResourceLocation("textures/restart.png");
     public static ResourceLocation restart_hovering_rl = new ResourceLocation("textures/restartHover.png");
 
@@ -49,16 +56,23 @@ public class GameController {
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
     public static Image target_texture = new Image(target_rl.toString(), 16, 16, true, false);
+    public static Image title_texture = new Image(title_rl.toString(), 2*66, 2*92, true, false);
+    public static Image click_info_texture = new Image(click_info_rl.toString(), 713, 41, true, false);
     public static Image restart_button_texture = new Image(restart_button_rl.toString(), 100, 100, true, false);
     public static Image restart_button_hovering_texture = new Image(restart_hovering_rl.toString(), 100, 100, true, false);
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
+    public static ImageView title_image = new ImageView(title_texture);
+    public static ImageView click_info_image = new ImageView(click_info_texture);
     public static ImageView restart_button_image = new ImageView(restart_button_texture);
 
-    private Group gameplayGroup;
-    private Group endGroup;
-    private Group startGroup;
-    private Group pauseGroup;
+    FadeTransition title_fade = new FadeTransition(Duration.seconds(1), title_image);
+    FadeTransition click_info_fade = new FadeTransition(Duration.seconds(1), click_info_image);
+
+    private Group gameplayGroup = new Group();
+    private Group endGroup = new Group();
+    private Group startGroup = new Group();
+    private Group pauseGroup = new Group();
 
     private Scene gameplayScene;
     private Scene endScene;
@@ -78,9 +92,8 @@ public class GameController {
         bulletController = new BulletController();
         shooter = new ShooterSprite(shooter_image, CENTER_X, CENTER_Y, 32, 32);
         score = 0;
-        state = GameState.GAMEPLAY;
-        gameplayGroup = new Group();
-        endGroup = new Group();
+        state = GameState.START;
+        startScene = new Scene(startGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         gameplayScene = new Scene(gameplayGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         endScene = new Scene(endGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         player.setVolume(0.3);
@@ -97,6 +110,8 @@ public class GameController {
 
     public Scene getScene(){
         switch(state){
+            case START:
+                return this.startScene;
             case GAMEPLAY:
                 return this.gameplayScene;
             case END:
@@ -104,6 +119,25 @@ public class GameController {
             default:
                 return this.gameplayScene;
         }
+    }
+
+    private void initStartScene(){
+        startCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
+        startGC = startCanvas.getGraphicsContext2D();
+        startGroup.getChildren().add(startCanvas);
+
+        title_fade.setFromValue(1.0);
+        title_fade.setToValue(0.0);
+
+        click_info_fade.setFromValue(1.0);
+        click_info_fade.setToValue(0.0);
+        click_info_fade.setOnFinished(event -> state = GameState.GAMEPLAY);
+
+        title_image.setTranslateX(CENTER_X-title_texture.getWidth()/2);
+        title_image.setTranslateY(CENTER_Y-title_texture.getHeight()/2-100);
+        click_info_image.setTranslateX(CENTER_X-click_info_texture.getWidth()/2);
+        click_info_image.setTranslateY(CENTER_Y-click_info_texture.getHeight()/2+100);
+        startGroup.getChildren().addAll(title_image, click_info_image);
     }
 
     private void initGameplayScene(){
@@ -159,6 +193,7 @@ public class GameController {
 
     public void runGame(Stage stage){
 
+        initStartScene();
         initGameplayScene();
         initEndScene();
 
@@ -170,6 +205,13 @@ public class GameController {
                 stage.setScene(getScene());
 
                 switch(state){
+                    case START:
+                        startGC.drawImage(background, 0, 0);
+                        startScene.setOnMouseClicked(event -> {
+                            title_fade.play();
+                            click_info_fade.play();
+                        });
+                        break;
                     case GAMEPLAY:
                         player.play();
                         gameplayGC.drawImage(background, 0, 0);
