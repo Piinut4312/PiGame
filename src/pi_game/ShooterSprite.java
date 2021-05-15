@@ -5,16 +5,21 @@ import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.AudioClip;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class ShooterSprite extends GameSprite{
 
     private int shoot_timer;
 
+    private static AudioClip SHOOT_SOUND = new AudioClip(new File("src/pi_game/shoot.mp3").toURI().toString());
+
     public ShooterSprite(ImageView texture, double x, double y, double width, double height) {
         super(texture, x, y, width, height, 0);
         this.shoot_timer = 0;
+        SHOOT_SOUND.setVolume(0.03);
     }
 
     public void update(double mouseX, double mouseY){
@@ -30,6 +35,7 @@ public class ShooterSprite extends GameSprite{
             ImageView bulletImage = new ImageView(PiGame.bullet_texture);
             group.getChildren().add(bulletImage);
             bullets.add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 10));
+            SHOOT_SOUND.play();
             this.shoot_timer = 0;
         }
     }

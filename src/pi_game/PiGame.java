@@ -9,6 +9,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -25,7 +26,7 @@ public class PiGame extends Application{
     public static double SCR_WIDTH = 1024;
     public static double SCR_HEIGHT = 768;
 
-    public static double RADIUS = 250;
+    public static double RADIUS = 200;
 
     public Canvas canvas;
     public GraphicsContext gc;
@@ -42,10 +43,6 @@ public class PiGame extends Application{
     public TargetController targetController = new TargetController(40);
 
     public ArrayList<BulletSprite> bullets = new ArrayList<>();
-
-    public Media SHOOT_SOUND = new Media(new File("src/pi_game/shoot.mp3").toURI().toString());
-
-    public MediaPlayer media_player = new MediaPlayer(SHOOT_SOUND);
 
     public static int score = 0;
 
@@ -85,10 +82,6 @@ public class PiGame extends Application{
         scene.setCursor(Cursor.DEFAULT);
 
         shooter = new ShooterSprite(shooter_image, SCR_WIDTH/2, SCR_HEIGHT/2, 32, 32);
-
-        media_player.setVolume(0.2);
-        media_player.setAutoPlay(true);
-        media_player.setOnReady(()->media_player.play());
 
         final long start = System.nanoTime();
 
