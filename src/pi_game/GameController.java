@@ -24,8 +24,10 @@ public class GameController {
     public static GraphicsContext gameplayGC;
 
     private Group gameplayGroup;
+    private Group endGroup;
 
     private Scene gameplayScene;
+    private Scene endScene;
 
     public static final double CENTER_X = PiGame.SCR_WIDTH/2;
     public static final double CENTER_Y = PiGame.SCR_HEIGHT/2;
@@ -37,16 +39,20 @@ public class GameController {
         score = 0;
         state = GameState.GAMEPLAY;
         gameplayGroup = new Group();
+        endGroup = new Group();
         gameplayScene = new Scene(gameplayGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
+        endScene = new Scene(endGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
 
     }
 
-    public Scene getScene(GameState gameState){
-        if(gameState == GameState.GAMEPLAY){
-            return this.gameplayScene;
-        }else{
-            return this.gameplayScene;
-            //nothing here... for now
+    public Scene getScene(){
+        switch(state){
+            case GAMEPLAY:
+                return this.gameplayScene;
+            case END:
+                return this.endScene;
+            default:
+                return this.gameplayScene;
         }
     }
 
@@ -84,29 +90,31 @@ public class GameController {
         gameplayGC.fillText("Score: "+score, x, y);
     }
 
-    public void update(){
+    public void runGame(){
 
-        if(state == GameState.GAMEPLAY){
-            initGameplayScene();
+        initGameplayScene();
 
-            //final long start = System.nanoTime();
+        new AnimationTimer(){
 
-            new AnimationTimer(){
-
-                @Override
-                public void handle(long now) {
-                    //double t = (now-start)/1000000000.0;
-                    gameplayGC.drawImage(PiGame.background, 0, 0);
+            @Override
+            public void handle(long now) {
+                //double t = (now-start)/1000000000.0;
+                gameplayGC.drawImage(PiGame.background, 0, 0);
+                if(state == GameState.GAMEPLAY){
                     renderScoreText(800, 100, 32, Color.WHITE);
                     gameplayScene.setOnMouseMoved(
                             event -> shooter.update(event.getX(), event.getY())
                     );
                     shooter.update(bulletController, gameplayGroup);
                     bulletController.update();
-                    targetController.update(gameplayGroup, bulletController);
+                    if(targetController.update(gameplayGroup, bulletController)){
+                        state = GameState.END;
+                    }
                 }
-            }.start();
-        }
+            }
+        }.start();
+
+
 
     }
 }

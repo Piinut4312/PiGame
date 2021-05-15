@@ -1,21 +1,9 @@
 package pi_game;
 
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
-import javafx.scene.Cursor;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
 
 public class PiGame extends Application{
 
@@ -41,9 +29,9 @@ public class PiGame extends Application{
     public void start(Stage primaryStage){
 
         primaryStage.setTitle("Pi: The Circular Shooting Game");
-        primaryStage.setScene(gameController.getScene(GameState.GAMEPLAY));
+        primaryStage.setScene(gameController.getScene());
 
-        gameController.update();
+        gameController.runGame();
 
         primaryStage.show();
     }

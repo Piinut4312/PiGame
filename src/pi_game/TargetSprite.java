@@ -13,11 +13,14 @@ public class TargetSprite extends GameSprite{
         this.setScale(4);
     }
 
-    public void update(){
+    public boolean update(){
         this.move(new Vec2d(-vel*(Math.cos(Math.PI/2+this.getRadian())), -vel*(Math.sin(Math.PI/2+this.getRadian()))));
         if(this.getDistanceTo(new Vec2d(PiGame.SCR_WIDTH/2, PiGame.SCR_HEIGHT/2)) > PiGame.RADIUS){
             this.kill();
+            return true;
+        }else{
+            this.render();
+            return false;
         }
-        this.render();
     }
 }

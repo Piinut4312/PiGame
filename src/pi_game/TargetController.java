@@ -21,7 +21,7 @@ public class TargetController {
         this.parent = parent;
     }
 
-    public void update(Group group, BulletController bulletController){
+    public boolean update(Group group, BulletController bulletController){
         spawn_timer++;
         if(spawn_timer >= SPAWN_RATE){
             ImageView targetImage = new ImageView(PiGame.target_texture);
@@ -32,7 +32,9 @@ public class TargetController {
         for(int i = 0; i < targets.size(); i++){
             TargetSprite target = targets.get(i);
             if(target.isAlive()){
-                target.update();
+                if(target.update()){
+                    return true;
+                }
                 for (BulletSprite bullet : bulletController.getBulletList()) {
                     if (target.intersects(bullet)) {
                         bullet.kill();
@@ -45,6 +47,7 @@ public class TargetController {
                 targets.remove(i);
             }
         }
+        return false;
     }
 
 }
