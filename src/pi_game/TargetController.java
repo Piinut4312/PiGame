@@ -31,11 +31,11 @@ public class TargetController {
             TargetSprite target = targets.get(i);
             if(target.isAlive()){
                 target.update();
-                for(int j = 0; j < bullets.size(); j++){
-                    BulletSprite bullet = bullets.get(j);
-                    if(target.intersects(bullet)){
+                for (BulletSprite bullet : bullets) {
+                    if (target.intersects(bullet)) {
                         bullet.kill();
                         target.kill();
+                        PiGame.score++;
                         break;
                     }
                 }

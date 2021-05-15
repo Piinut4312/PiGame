@@ -11,6 +11,7 @@ public abstract class GameSprite {
     private ImageView texture;
     private double x, y, width, height, angle;
     private boolean isDead;
+    private double scale;
 
     public GameSprite(ImageView texture, double x, double y, double width, double height, double angle) {
         this.texture = texture;
@@ -19,12 +20,13 @@ public abstract class GameSprite {
         this.width = width;
         this.height = height;
         this.angle = angle;
+        this.scale = 2;
         this.isDead = false;
     }
 
     public void render(){
-        texture.setScaleX(2);
-        texture.setScaleY(2);
+        texture.setScaleX(scale);
+        texture.setScaleY(scale);
         texture.setX(x-width/2);
         texture.setY(y-height/2);
         texture.setRotate(angle);
@@ -91,6 +93,10 @@ public abstract class GameSprite {
 
     public double getRadian(){
         return angle*(Math.PI/180.0);
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
     }
 
     public void setAngle(double angle) {

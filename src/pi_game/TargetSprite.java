@@ -10,6 +10,7 @@ public class TargetSprite extends GameSprite{
     public TargetSprite(ImageView texture, double x, double y, double width, double height, double angle, double vel) {
         super(texture, x, y, width, height, angle);
         this.vel = vel;
+        this.setScale(4);
     }
 
     public void update(){

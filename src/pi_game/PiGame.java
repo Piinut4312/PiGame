@@ -14,6 +14,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -45,6 +46,8 @@ public class PiGame extends Application{
     public Media SHOOT_SOUND = new Media(new File("src/pi_game/shoot.mp3").toURI().toString());
 
     public MediaPlayer media_player = new MediaPlayer(SHOOT_SOUND);
+
+    public static int score = 0;
 
     public static void main(String[] args) {
         launch(args);
@@ -96,6 +99,9 @@ public class PiGame extends Application{
                 double t = (now-start)/1000000000.0;
                 gc.clearRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
                 gc.drawImage(background, 0, 0);
+                gc.setFill(Color.WHITE);
+                gc.setFont(new Font("Times New Roman", 32));
+                gc.fillText("Score: "+score, 800, 100);
                 scene.setOnMouseMoved(
                         event -> shooter.update(event.getX(), event.getY())
                 );
