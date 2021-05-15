@@ -10,6 +10,7 @@ import javafx.scene.transform.Rotate;
 public abstract class GameSprite {
     private ImageView texture;
     private double x, y, width, height, angle;
+    private boolean isDead;
 
     public GameSprite(ImageView texture, double x, double y, double width, double height, double angle) {
         this.texture = texture;
@@ -18,11 +19,13 @@ public abstract class GameSprite {
         this.width = width;
         this.height = height;
         this.angle = angle;
+        this.isDead = false;
     }
 
-    public abstract void update(double newX, double newY);
-
     public void render(){
+        if(isDead){
+            texture.setVisible(false);
+        }
         texture.setScaleX(2);
         texture.setScaleY(2);
         texture.setX(x-width/2);
@@ -59,6 +62,15 @@ public abstract class GameSprite {
         this.setY(v.y);
     }
 
+    public void move(Vec2d v){
+        this.setX(this.x + v.x);
+        this.setY(this.y + v.y);
+    }
+
+    public double getDistanceTo(Vec2d v){
+        return v.distance(new Vec2d(this.x, this.y));
+    }
+
     public double getWidth() {
         return width;
     }
@@ -67,8 +79,20 @@ public abstract class GameSprite {
         return height;
     }
 
+    public boolean isAlive(){
+        return !this.isDead;
+    }
+
+    public void kill(){
+        this.isDead = true;
+    }
+
     public double getAngle() {
         return angle;
+    }
+
+    public double getRadian(){
+        return angle*(Math.PI/180.0);
     }
 
     public void setAngle(double angle) {

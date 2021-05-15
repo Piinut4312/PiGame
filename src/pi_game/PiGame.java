@@ -17,6 +17,7 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class PiGame extends Application{
 
@@ -28,12 +29,16 @@ public class PiGame extends Application{
     public Canvas canvas;
     public GraphicsContext gc;
 
-    public Image shooter_texture = new Image("pi_game/shooter.png", 32, 32, true, false);
-    public Image background = new Image("pi_game/background.jpg");
+    public static Image shooter_texture = new Image("pi_game/shooter.png", 32, 32, true, false);
+    public static Image bullet_texture = new Image("pi_game/drop.png", 16, 16, true, false);
+    public static Image background = new Image("pi_game/background.jpg");
 
-    public ImageView shooter_image = new ImageView(shooter_texture);
+    public static ImageView shooter_image = new ImageView(shooter_texture);
+    public static ImageView bullet_image = new ImageView(bullet_texture);
 
     public ShooterSprite shooter;
+
+    public ArrayList<BulletSprite> bullets = new ArrayList<>();
 
     public Media SHOOT_SOUND = new Media(new File("src/pi_game/shoot.mp3").toURI().toString());
 
@@ -87,11 +92,21 @@ public class PiGame extends Application{
             @Override
             public void handle(long now) {
                 double t = (now-start)/1000000000.0;
+                gc.clearRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
+                gc.drawImage(background, 0, 0);
                 scene.setOnMouseMoved(
                         event -> shooter.update(event.getX(), event.getY())
                 );
-                gc.clearRect(0, 0, SCR_WIDTH, SCR_HEIGHT);
-                gc.drawImage(background, 0, 0);
+                shooter.update(bullets, root);
+                System.out.println(bullets.size());
+                for(int i = 0; i < bullets.size(); i++){
+                    BulletSprite bullet = bullets.get(i);
+                    if(bullet.isAlive()){
+                        bullet.update();
+                    }else{
+                        bullets.remove(i);
+                    }
+                }
                 shooter.render();
 
             }

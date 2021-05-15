@@ -1,25 +1,36 @@
 package pi_game;
 
 import com.sun.javafx.geom.Vec2d;
+import javafx.scene.Group;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.util.ArrayList;
+
 public class ShooterSprite extends GameSprite{
 
     private int shoot_timer;
-    private boolean isDead;
 
     public ShooterSprite(ImageView texture, double x, double y, double width, double height) {
         super(texture, x, y, width, height, 0);
-        this.shoot_timer = 10;
-        this.isDead = false;
+        this.shoot_timer = 0;
     }
 
     public void update(double mouseX, double mouseY){
-        if(!this.isDead){
+        if(this.isAlive()){
             this.setPos(solveNewPos(mouseX, mouseY, 32));
             this.setFacing();
+        }
+    }
+
+    public void update(ArrayList<BulletSprite> bullets, Group group){
+        this.shoot_timer++;
+        if(shoot_timer > 20){
+            ImageView bulletImage = new ImageView(PiGame.bullet_texture);
+            group.getChildren().add(bulletImage);
+            bullets.add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 5));
+            this.shoot_timer = 0;
         }
     }
 
