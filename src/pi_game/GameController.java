@@ -39,7 +39,6 @@ public class GameController {
     public static GraphicsContext gameplayGC;
     public static GraphicsContext endGC;
 
-
     public static ResourceLocation background_rl = new ResourceLocation("textures/background.jpg");
     public static ResourceLocation shooter_rl = new ResourceLocation("textures/shooter.png");
     public static ResourceLocation bullet_rl = new ResourceLocation("textures/drop.png");
@@ -52,22 +51,18 @@ public class GameController {
     public static ResourceLocation press_sound_rl = new ResourceLocation("sounds/button_press.mp3");
     public static ResourceLocation gameplaybgm_rl = new ResourceLocation("sounds/gameplayBGM.mp3");
 
+    public static ImageSprite title = new ImageSprite(title_rl, 2*66, 2*92);
+    public static ImageSprite clickInfo = new ImageSprite(click_info_rl, 713, 41);
+
     public static Image background = new Image(background_rl.toString());
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
     public static Image target_texture = new Image(target_rl.toString(), 16, 16, true, false);
-    public static Image title_texture = new Image(title_rl.toString(), 2*66, 2*92, true, false);
-    public static Image click_info_texture = new Image(click_info_rl.toString(), 713, 41, true, false);
     public static Image restart_button_texture = new Image(restart_button_rl.toString(), 100, 100, true, false);
     public static Image restart_button_hovering_texture = new Image(restart_hovering_rl.toString(), 100, 100, true, false);
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
-    public static ImageView title_image = new ImageView(title_texture);
-    public static ImageView click_info_image = new ImageView(click_info_texture);
     public static ImageView restart_button_image = new ImageView(restart_button_texture);
-
-    FadeTransition title_fade = new FadeTransition(Duration.seconds(1), title_image);
-    FadeTransition click_info_fade = new FadeTransition(Duration.seconds(1), click_info_image);
 
     private Group gameplayGroup = new Group();
     private Group endGroup = new Group();
@@ -105,7 +100,6 @@ public class GameController {
         bulletController.restart();
         score = 0;
         state = GameState.GAMEPLAY;
-
     }
 
     public Scene getScene(){
@@ -126,18 +120,13 @@ public class GameController {
         startGC = startCanvas.getGraphicsContext2D();
         startGroup.getChildren().add(startCanvas);
 
-        title_fade.setFromValue(1.0);
-        title_fade.setToValue(0.0);
+        title.initFadeOut(1, 1.0, 0.0);
+        clickInfo.initFadeOut(1, 1.0, 0.0);
+        clickInfo.getFadeOut().setOnFinished(event -> state = GameState.GAMEPLAY);
 
-        click_info_fade.setFromValue(1.0);
-        click_info_fade.setToValue(0.0);
-        click_info_fade.setOnFinished(event -> state = GameState.GAMEPLAY);
-
-        title_image.setTranslateX(CENTER_X-title_texture.getWidth()/2);
-        title_image.setTranslateY(CENTER_Y-title_texture.getHeight()/2-100);
-        click_info_image.setTranslateX(CENTER_X-click_info_texture.getWidth()/2);
-        click_info_image.setTranslateY(CENTER_Y-click_info_texture.getHeight()/2+100);
-        startGroup.getChildren().addAll(title_image, click_info_image);
+        title.setPos(CENTER_X, CENTER_Y-100);
+        clickInfo.setPos(CENTER_X, CENTER_Y+100);
+        startGroup.getChildren().addAll(title.getImageView(), clickInfo.getImageView());
     }
 
     private void initGameplayScene(){
@@ -208,8 +197,8 @@ public class GameController {
                     case START:
                         startGC.drawImage(background, 0, 0);
                         startScene.setOnMouseClicked(event -> {
-                            title_fade.play();
-                            click_info_fade.play();
+                            title.getFadeOut().play();
+                            clickInfo.getFadeOut().play();
                         });
                         break;
                     case GAMEPLAY:
@@ -238,6 +227,5 @@ public class GameController {
         }.start();
 
         stage.show();
-
     }
 }
