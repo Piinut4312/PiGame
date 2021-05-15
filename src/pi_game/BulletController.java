@@ -14,6 +14,13 @@ public class BulletController {
         return this.bullets;
     }
 
+    public void restart(){
+        for(BulletSprite bullet : bullets){
+            bullet.kill();
+        }
+        this.bullets.clear();
+    }
+
     public void update(){
         for(int i = 0; i < bullets.size(); i++){
             BulletSprite bullet = bullets.get(i);

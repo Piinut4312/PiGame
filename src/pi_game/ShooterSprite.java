@@ -14,7 +14,8 @@ public class ShooterSprite extends GameSprite{
 
     private int shoot_timer;
 
-    private static AudioClip SHOOT_SOUND = new AudioClip(new File("src/pi_game/shoot.mp3").toURI().toString());
+    private static ResourceLocation shoot_sound_rl = new ResourceLocation("sounds/shoot.mp3");
+    private static AudioClip SHOOT_SOUND = new AudioClip(shoot_sound_rl.fromFileToString());
 
     public ShooterSprite(ImageView texture, double x, double y, double width, double height) {
         super(texture, x, y, width, height, 0);

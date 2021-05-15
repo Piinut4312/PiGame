@@ -34,12 +34,26 @@ public class GameController {
     public static GraphicsContext gameplayGC;
     public static GraphicsContext endGC;
 
-    public static Image background = new Image("pi_game/resources/background.jpg");
-    public static Image shooter_texture = new Image("pi_game/resources/shooter.png", 32, 32, true, false);
-    public static Image bullet_texture = new Image("pi_game/resources/drop.png", 16, 16, true, false);
-    public static Image target_texture = new Image("pi_game/resources/target.png", 16, 16, true, false);
+
+    public static ResourceLocation background_rl = new ResourceLocation("textures/background.jpg");
+    public static ResourceLocation shooter_rl = new ResourceLocation("textures/shooter.png");
+    public static ResourceLocation bullet_rl = new ResourceLocation("textures/drop.png");
+    public static ResourceLocation target_rl = new ResourceLocation("textures/target.png");
+    public static ResourceLocation restart_button_rl = new ResourceLocation("textures/restart.png");
+    public static ResourceLocation restart_hovering_rl = new ResourceLocation("textures/restartHover.png");
+
+    public static ResourceLocation press_sound_rl = new ResourceLocation("sounds/button_press.mp3");
+    public static ResourceLocation gameplaybgm_rl = new ResourceLocation("sounds/gameplayBGM.mp3");
+
+    public static Image background = new Image(background_rl.toString());
+    public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
+    public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
+    public static Image target_texture = new Image(target_rl.toString(), 16, 16, true, false);
+    public static Image restart_button_texture = new Image(restart_button_rl.toString(), 100, 100, true, false);
+    public static Image restart_button_hovering_texture = new Image(restart_hovering_rl.toString(), 100, 100, true, false);
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
+    public static ImageView restart_button_image = new ImageView(restart_button_texture);
 
     private Group gameplayGroup;
     private Group endGroup;
@@ -51,7 +65,9 @@ public class GameController {
     private Scene startScene;
     private Scene pauseScene;
 
-    private static final Media GAMEPLAY_BGM = new Media(new File("src/pi_game/gameplayBGM.mp3").toURI().toString());
+    private static AudioClip PRESS_SOUND = new AudioClip(press_sound_rl.fromFileToString());
+
+    private static final Media GAMEPLAY_BGM = new Media(gameplaybgm_rl.fromFileToString());
     private MediaPlayer player = new MediaPlayer(GAMEPLAY_BGM);
 
     public static final double CENTER_X = PiGame.SCR_WIDTH/2;
@@ -68,6 +84,15 @@ public class GameController {
         gameplayScene = new Scene(gameplayGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         endScene = new Scene(endGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         player.setVolume(0.3);
+        PRESS_SOUND.setVolume(0.3);
+    }
+
+    public void restart(){
+        targetController.restart();
+        bulletController.restart();
+        score = 0;
+        state = GameState.GAMEPLAY;
+
     }
 
     public Scene getScene(){
@@ -108,6 +133,17 @@ public class GameController {
         endCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         endGC = endCanvas.getGraphicsContext2D();
         endGroup.getChildren().add(endCanvas);
+
+        restart_button_image.setTranslateX(CENTER_X-restart_button_texture.getWidth()/2);
+        restart_button_image.setTranslateY(CENTER_Y+100-restart_button_texture.getHeight()/2);
+        restart_button_image.setPickOnBounds(true);
+        restart_button_image.setOnMouseEntered(event -> restart_button_image.setImage(restart_button_hovering_texture));
+        restart_button_image.setOnMouseExited(event -> restart_button_image.setImage(restart_button_texture));
+        restart_button_image.setOnMouseClicked(event -> {
+            PRESS_SOUND.play();
+            restart();
+        });
+        endGroup.getChildren().add(restart_button_image);
     }
 
     public void gainScore(){
