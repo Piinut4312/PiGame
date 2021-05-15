@@ -19,7 +19,7 @@ public class TargetController {
         rng = new Random();
     }
 
-    public void update(Group group){
+    public void update(Group group, ArrayList<BulletSprite> bullets){
         spawn_timer++;
         if(spawn_timer >= SPAWN_RATE){
             ImageView targetImage = new ImageView(PiGame.target_texture);
@@ -31,6 +31,14 @@ public class TargetController {
             TargetSprite target = targets.get(i);
             if(target.isAlive()){
                 target.update();
+                for(int j = 0; j < bullets.size(); j++){
+                    BulletSprite bullet = bullets.get(j);
+                    if(target.intersects(bullet)){
+                        bullet.kill();
+                        target.kill();
+                        break;
+                    }
+                }
             }else{
                 targets.remove(i);
             }

@@ -29,10 +29,10 @@ public class PiGame extends Application{
     public Canvas canvas;
     public GraphicsContext gc;
 
-    public static Image shooter_texture = new Image("pi_game/shooter.png", 32, 32, true, false);
-    public static Image bullet_texture = new Image("pi_game/drop.png", 16, 16, true, false);
-    public static Image target_texture = new Image("pi_game/target.png", 16, 16, true, false);
-    public static Image background = new Image("pi_game/background.jpg");
+    public static Image shooter_texture = new Image("pi_game/resources/shooter.png", 32, 32, true, false);
+    public static Image bullet_texture = new Image("pi_game/resources/drop.png", 16, 16, true, false);
+    public static Image target_texture = new Image("pi_game/resources/target.png", 16, 16, true, false);
+    public static Image background = new Image("pi_game/resources/background.jpg");
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
 
@@ -109,7 +109,7 @@ public class PiGame extends Application{
                     }
                 }
                 shooter.render();
-                targetController.update(root);
+                targetController.update(root, bullets);
             }
         }.start();
 

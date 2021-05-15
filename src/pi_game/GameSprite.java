@@ -23,9 +23,6 @@ public abstract class GameSprite {
     }
 
     public void render(){
-        if(isDead){
-            texture.setVisible(false);
-        }
         texture.setScaleX(2);
         texture.setScaleY(2);
         texture.setX(x-width/2);
@@ -85,6 +82,7 @@ public abstract class GameSprite {
 
     public void kill(){
         this.isDead = true;
+        texture.setVisible(false);
     }
 
     public double getAngle() {
