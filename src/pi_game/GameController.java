@@ -1,8 +1,6 @@
 package pi_game;
 
 import javafx.animation.AnimationTimer;
-import javafx.animation.FadeTransition;
-import javafx.animation.Transition;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -21,8 +19,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.io.File;
 
 public class GameController {
 
@@ -47,22 +43,24 @@ public class GameController {
     public static ResourceLocation click_info_rl = new ResourceLocation("textures/clickInfo.png");
     public static ResourceLocation restart_button_rl = new ResourceLocation("textures/restart.png");
     public static ResourceLocation restart_hovering_rl = new ResourceLocation("textures/restartHover.png");
+    public static ResourceLocation menu_button_rl = new ResourceLocation("textures/menu.png");
+    public static ResourceLocation menu_hover_rl = new ResourceLocation("textures/menuHover.png");
 
     public static ResourceLocation press_sound_rl = new ResourceLocation("sounds/button_press.mp3");
     public static ResourceLocation gameplaybgm_rl = new ResourceLocation("sounds/gameplayBGM.mp3");
 
-    public static ImageSprite title = new ImageSprite(title_rl, 2*66, 2*92);
-    public static ImageSprite clickInfo = new ImageSprite(click_info_rl, 713, 41);
+    public ImageSprite title = new ImageSprite(title_rl, 2*66, 2*92);
+    public ImageSprite clickInfo = new ImageSprite(click_info_rl, 713, 41);
+
+    public ButtonSprite restart = new ButtonSprite(restart_button_rl, restart_hovering_rl, 100, 100);
+    public ButtonSprite menu = new ButtonSprite(menu_button_rl, menu_hover_rl, 100, 100);
 
     public static Image background = new Image(background_rl.toString());
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
     public static Image target_texture = new Image(target_rl.toString(), 16, 16, true, false);
-    public static Image restart_button_texture = new Image(restart_button_rl.toString(), 100, 100, true, false);
-    public static Image restart_button_hovering_texture = new Image(restart_hovering_rl.toString(), 100, 100, true, false);
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
-    public static ImageView restart_button_image = new ImageView(restart_button_texture);
 
     private Group gameplayGroup = new Group();
     private Group endGroup = new Group();
@@ -99,7 +97,6 @@ public class GameController {
         targetController.restart();
         bulletController.restart();
         score = 0;
-        state = GameState.GAMEPLAY;
     }
 
     public Scene getScene(){
@@ -124,9 +121,15 @@ public class GameController {
         clickInfo.initFadeOut(1, 1.0, 0.0);
         clickInfo.getFadeOut().setOnFinished(event -> state = GameState.GAMEPLAY);
 
+        title.initFadeIn(1, 0.0, 1.0);
+        clickInfo.initFadeIn(1, 0.0, 1.0);
+
         title.setPos(CENTER_X, CENTER_Y-100);
         clickInfo.setPos(CENTER_X, CENTER_Y+100);
         startGroup.getChildren().addAll(title.getImageView(), clickInfo.getImageView());
+
+        title.getFadeIn().play();
+        clickInfo.getFadeIn().play();
     }
 
     private void initGameplayScene(){
@@ -157,16 +160,23 @@ public class GameController {
         endGC = endCanvas.getGraphicsContext2D();
         endGroup.getChildren().add(endCanvas);
 
-        restart_button_image.setTranslateX(CENTER_X-restart_button_texture.getWidth()/2);
-        restart_button_image.setTranslateY(CENTER_Y+100-restart_button_texture.getHeight()/2);
-        restart_button_image.setPickOnBounds(true);
-        restart_button_image.setOnMouseEntered(event -> restart_button_image.setImage(restart_button_hovering_texture));
-        restart_button_image.setOnMouseExited(event -> restart_button_image.setImage(restart_button_texture));
-        restart_button_image.setOnMouseClicked(event -> {
+        restart.setPos(CENTER_X, CENTER_Y+100);
+        restart.clicked(()->{
             PRESS_SOUND.play();
             restart();
+            state = GameState.GAMEPLAY;
         });
-        endGroup.getChildren().add(restart_button_image);
+
+        menu.setPos(CENTER_X, CENTER_Y+250);
+        menu.clicked(()->{
+            PRESS_SOUND.play();
+            restart();
+            title.getFadeIn().play();
+            clickInfo.getFadeIn().play();
+            state = GameState.START;
+        });
+
+        endGroup.getChildren().addAll(restart.image.getImageView(), menu.image.getImageView());
     }
 
     public void gainScore(){
@@ -197,6 +207,7 @@ public class GameController {
                     case START:
                         startGC.drawImage(background, 0, 0);
                         startScene.setOnMouseClicked(event -> {
+                            PRESS_SOUND.play();
                             title.getFadeOut().play();
                             clickInfo.getFadeOut().play();
                         });

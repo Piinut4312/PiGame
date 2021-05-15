@@ -11,6 +11,7 @@ public class ImageSprite {
     private Image texture;
     private ImageView image;
     private FadeTransition fadeOut;
+    private FadeTransition fadeIn;
 
     public ImageSprite(ResourceLocation resource){
         this.resource = resource;
@@ -37,11 +38,22 @@ public class ImageSprite {
         return this.fadeOut;
     }
 
+    public FadeTransition getFadeIn(){
+        return this.fadeIn;
+    }
+
     public void initFadeOut(int duration, double start, double end){
         fadeOut = new FadeTransition(Duration.seconds(duration), this.image);
         fadeOut.setFromValue(start);
         fadeOut.setToValue(end);
     }
+
+    public void initFadeIn(int duration, double start, double end){
+        fadeIn = new FadeTransition(Duration.seconds(duration), this.image);
+        fadeIn.setFromValue(start);
+        fadeIn.setToValue(end);
+    }
+
 
 
 
