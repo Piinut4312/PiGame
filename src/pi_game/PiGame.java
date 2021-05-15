@@ -24,19 +24,21 @@ public class PiGame extends Application{
     public static double SCR_WIDTH = 1024;
     public static double SCR_HEIGHT = 768;
 
-    public static double RADIUS = 200;
+    public static double RADIUS = 250;
 
     public Canvas canvas;
     public GraphicsContext gc;
 
     public static Image shooter_texture = new Image("pi_game/shooter.png", 32, 32, true, false);
     public static Image bullet_texture = new Image("pi_game/drop.png", 16, 16, true, false);
+    public static Image target_texture = new Image("pi_game/target.png", 16, 16, true, false);
     public static Image background = new Image("pi_game/background.jpg");
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
-    public static ImageView bullet_image = new ImageView(bullet_texture);
 
     public ShooterSprite shooter;
+
+    public TargetController targetController = new TargetController(40);
 
     public ArrayList<BulletSprite> bullets = new ArrayList<>();
 
@@ -98,7 +100,6 @@ public class PiGame extends Application{
                         event -> shooter.update(event.getX(), event.getY())
                 );
                 shooter.update(bullets, root);
-                System.out.println(bullets.size());
                 for(int i = 0; i < bullets.size(); i++){
                     BulletSprite bullet = bullets.get(i);
                     if(bullet.isAlive()){
@@ -108,7 +109,7 @@ public class PiGame extends Application{
                     }
                 }
                 shooter.render();
-
+                targetController.update(root);
             }
         }.start();
 
