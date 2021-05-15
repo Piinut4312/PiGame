@@ -42,19 +42,16 @@ public class ImageSprite {
         return this.fadeIn;
     }
 
-    public void initFadeOut(int duration, double start, double end){
+    public void initFadeOut(double duration, double start, double end){
         fadeOut = new FadeTransition(Duration.seconds(duration), this.image);
         fadeOut.setFromValue(start);
         fadeOut.setToValue(end);
     }
 
-    public void initFadeIn(int duration, double start, double end){
+    public void initFadeIn(double duration, double start, double end){
         fadeIn = new FadeTransition(Duration.seconds(duration), this.image);
         fadeIn.setFromValue(start);
         fadeIn.setToValue(end);
     }
-
-
-
 
 }

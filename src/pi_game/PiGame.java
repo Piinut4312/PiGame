@@ -23,7 +23,6 @@ public class PiGame extends Application{
 
         gameController.runGame(primaryStage);
 
-
     }
 
 }

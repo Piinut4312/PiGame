@@ -14,11 +14,9 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 public class GameController {
 
@@ -51,11 +49,13 @@ public class GameController {
 
     public ImageSprite title = new ImageSprite(title_rl, 2*66, 2*92);
     public ImageSprite clickInfo = new ImageSprite(click_info_rl, 713, 41);
+    public ImageSprite start_background = new ImageSprite(background_rl, 1200, 800);
+    public ImageSprite gameplay_background = new ImageSprite(background_rl, 1200, 800);
+    public ImageSprite end_background = new ImageSprite(background_rl, 1200, 800);
 
     public ButtonSprite restart = new ButtonSprite(restart_button_rl, restart_hovering_rl, 100, 100);
     public ButtonSprite menu = new ButtonSprite(menu_button_rl, menu_hover_rl, 100, 100);
 
-    public static Image background = new Image(background_rl.toString());
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
     public static Image target_texture = new Image(target_rl.toString(), 16, 16, true, false);
@@ -124,9 +124,10 @@ public class GameController {
         title.initFadeIn(1, 0.0, 1.0);
         clickInfo.initFadeIn(1, 0.0, 1.0);
 
+        start_background.setPos(CENTER_X, CENTER_Y);
         title.setPos(CENTER_X, CENTER_Y-100);
         clickInfo.setPos(CENTER_X, CENTER_Y+100);
-        startGroup.getChildren().addAll(title.getImageView(), clickInfo.getImageView());
+        startGroup.getChildren().addAll(start_background.getImageView(), title.getImageView(), clickInfo.getImageView());
 
         title.getFadeIn().play();
         clickInfo.getFadeIn().play();
@@ -135,7 +136,13 @@ public class GameController {
     private void initGameplayScene(){
         gameplayCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         gameplayGC = gameplayCanvas.getGraphicsContext2D();
-        gameplayGroup.getChildren().addAll(gameplayCanvas, shooter_image);
+
+        gameplay_background.setPos(CENTER_X, CENTER_Y);
+        gameplay_background.initFadeOut(0.3, 1.0, 0.0);
+        gameplay_background.initFadeIn(0.3, 0.0, 1.0);
+        gameplay_background.getFadeOut().setOnFinished(event -> state = GameState.END);
+
+        gameplayGroup.getChildren().addAll(gameplay_background.getImageView(), gameplayCanvas, shooter_image);
 
         Circle circle = new Circle(CENTER_X, CENTER_Y, PiGame.RADIUS);
         circle.setFill(Color.TRANSPARENT);
@@ -144,13 +151,12 @@ public class GameController {
         circle.toBack();
         gameplayGroup.getChildren().add(circle);
 
-        Line line1 = new Line(CENTER_X-16, CENTER_Y, CENTER_X+16, CENTER_Y);
-        Line line2 = new Line(CENTER_X, CENTER_Y-16, CENTER_X, CENTER_Y+16);
-        line1.setStroke(Color.AZURE);
-        line2.setStroke(Color.AZURE);
-        line1.setStrokeWidth(2);
-        line2.setStrokeWidth(2);
-        gameplayGroup.getChildren().addAll(line1, line2);
+        Circle smallCircle = new Circle(CENTER_X, CENTER_Y, 10);
+        smallCircle.setFill(Color.AZURE);
+        smallCircle.setStroke(Color.AZURE);
+        smallCircle.setStrokeWidth(2);
+        smallCircle.toBack();
+        gameplayGroup.getChildren().add(smallCircle);
 
         gameplayScene.setCursor(Cursor.DEFAULT);
     }
@@ -158,10 +164,14 @@ public class GameController {
     private void initEndScene(){
         endCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         endGC = endCanvas.getGraphicsContext2D();
-        endGroup.getChildren().add(endCanvas);
+
+        end_background.setPos(CENTER_X, CENTER_Y);
+
+        endGroup.getChildren().addAll(end_background.getImageView(), endCanvas);
 
         restart.setPos(CENTER_X, CENTER_Y+100);
         restart.clicked(()->{
+            gameplay_background.getFadeIn().play();
             PRESS_SOUND.play();
             restart();
             state = GameState.GAMEPLAY;
@@ -205,8 +215,8 @@ public class GameController {
 
                 switch(state){
                     case START:
-                        startGC.drawImage(background, 0, 0);
                         startScene.setOnMouseClicked(event -> {
+                            gameplay_background.getFadeIn().play();
                             PRESS_SOUND.play();
                             title.getFadeOut().play();
                             clickInfo.getFadeOut().play();
@@ -214,7 +224,7 @@ public class GameController {
                         break;
                     case GAMEPLAY:
                         player.play();
-                        gameplayGC.drawImage(background, 0, 0);
+                        gameplayGC.clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
                         renderText(gameplayGC,800, 100, 32, Color.WHITE, TextAlignment.LEFT, "Score: "+score);
                         gameplayScene.setOnMouseMoved(
                                 event -> shooter.update(event.getX(), event.getY())
@@ -222,12 +232,12 @@ public class GameController {
                         shooter.update(bulletController, gameplayGroup);
                         bulletController.update();
                         if(targetController.update(gameplayGroup, bulletController)){
-                            state = GameState.END;
+                            gameplay_background.getFadeOut().play();
                         }
                         break;
                     case END:
-                        endGC.drawImage(background, 0, 0);
                         player.stop();
+                        endGC.clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
                         renderText(endGC, CENTER_X, CENTER_Y-100, 56, Color.WHITE, TextAlignment.CENTER, "Final Score: "+score);
                         break;
                     default:
