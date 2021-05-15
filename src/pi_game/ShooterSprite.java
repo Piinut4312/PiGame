@@ -29,15 +29,16 @@ public class ShooterSprite extends GameSprite{
         }
     }
 
-    public void update(ArrayList<BulletSprite> bullets, Group group){
+    public void update(BulletController bulletController, Group group){
         this.shoot_timer++;
         if(shoot_timer > 20){
             ImageView bulletImage = new ImageView(PiGame.bullet_texture);
             group.getChildren().add(bulletImage);
-            bullets.add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 10));
+            bulletController.getBulletList().add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 10));
             SHOOT_SOUND.play();
             this.shoot_timer = 0;
         }
+        this.render();
     }
 
     public Vec2d solveNewPos(double mouseX, double mouseY, double offset){

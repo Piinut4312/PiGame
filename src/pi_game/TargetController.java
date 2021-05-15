@@ -8,18 +8,20 @@ import java.util.Random;
 
 public class TargetController {
 
-    ArrayList<TargetSprite> targets;
+    private ArrayList<TargetSprite> targets;
     private final int SPAWN_RATE;
     private int spawn_timer;
     private Random rng;
+    private GameController parent;
 
-    public TargetController(int spawn_rate){
+    public TargetController(GameController parent, int spawn_rate){
         targets = new ArrayList<>();
         SPAWN_RATE = spawn_rate;
         rng = new Random();
+        this.parent = parent;
     }
 
-    public void update(Group group, ArrayList<BulletSprite> bullets){
+    public void update(Group group, BulletController bulletController){
         spawn_timer++;
         if(spawn_timer >= SPAWN_RATE){
             ImageView targetImage = new ImageView(PiGame.target_texture);
@@ -31,11 +33,11 @@ public class TargetController {
             TargetSprite target = targets.get(i);
             if(target.isAlive()){
                 target.update();
-                for (BulletSprite bullet : bullets) {
+                for (BulletSprite bullet : bulletController.getBulletList()) {
                     if (target.intersects(bullet)) {
                         bullet.kill();
                         target.kill();
-                        PiGame.score++;
+                        parent.gainScore();
                         break;
                     }
                 }
