@@ -56,7 +56,7 @@ public class TargetController {
                         target.kill();
                         EXPLOSION_SOUND.play();
                         parent.gainScore();
-                        particleController.addParticleSystem(new ParticleSystem(16, target.getX(), target.getY(), 5, 10, 10, Color.ORANGE));
+                        particleController.addParticleSystem(new ParticleSystem(16, target.getX(), target.getY(), 15, 12, 20, ParticleColors.EXPLOSION, new ParticleSystemProperties(5, 4, 10)));
                         break;
                     }
                 }

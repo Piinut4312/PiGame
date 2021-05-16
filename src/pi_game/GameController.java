@@ -114,6 +114,19 @@ public class GameController {
         }
     }
 
+    public GraphicsContext getGC(){
+        switch (state){
+            case START:
+                return startGC;
+            case GAMEPLAY:
+                return gameplayGC;
+            case END:
+                return endGC;
+            default:
+                return endGC;
+        }
+    }
+
     private void initStartScene(){
         startCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         startGC = startCanvas.getGraphicsContext2D();
@@ -188,6 +201,10 @@ public class GameController {
             state = GameState.START;
         });
 
+        endScene.setOnMouseClicked(event ->{
+            particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 10, 12, 10, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3)));
+        });
+
         endGroup.getChildren().addAll(restart.image.getImageView(), menu.image.getImageView());
     }
 
@@ -234,8 +251,6 @@ public class GameController {
                         );
                         shooter.update(bulletController, gameplayGroup);
                         bulletController.update();
-                        particleController.update(gameplayGC);
-
                         if(targetController.update(gameplayGroup, bulletController, particleController)){
                             gameplay_background.getFadeOut().play();
                         }
@@ -248,6 +263,7 @@ public class GameController {
                     default:
                         System.out.println("Who am I? Why am I here?");
                 }
+                particleController.update(getGC());
 
             }
         }.start();

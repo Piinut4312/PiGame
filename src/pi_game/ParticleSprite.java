@@ -24,8 +24,10 @@ public class ParticleSprite {
     }
 
     public void move(){
-        this.x += vel*Math.cos(Math.toRadians(angle));
-        this.y += vel*Math.sin(Math.toRadians(angle));
+
+        double curVel = vel*getVelFactor(age, 1.2);
+        this.x += curVel*Math.cos(Math.toRadians(angle));
+        this.y += curVel*Math.sin(Math.toRadians(angle));
         this.age++;
         if(this.age >= MAX_AGE){
             this.isDead = true;
@@ -34,12 +36,16 @@ public class ParticleSprite {
 
     public void render(GraphicsContext gc){
         gc.setFill(color);
-        gc.setGlobalAlpha(1-(1.0*age)/MAX_AGE);
+        gc.setGlobalAlpha(getVelFactor(age, 1.0/6));
         gc.fillOval(x, y, size, size);
     }
 
     public boolean isAlive(){
         return !this.isDead;
+    }
+
+    public double getVelFactor(double age, double f){
+        return Math.exp(-age*f);
     }
 
 }
