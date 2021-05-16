@@ -23,6 +23,7 @@ public class GameController {
     private TargetController targetController;
     private BulletController bulletController;
     private ShooterSprite shooter;
+    private ParticleController particleController;
     private int score;
     private GameState state;
 
@@ -84,6 +85,7 @@ public class GameController {
         targetController = new TargetController(this, spawn_rate);
         bulletController = new BulletController();
         shooter = new ShooterSprite(shooter_image, CENTER_X, CENTER_Y, 32, 32);
+        particleController = new ParticleController();
         score = 0;
         state = GameState.START;
         startScene = new Scene(startGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
@@ -195,6 +197,7 @@ public class GameController {
 
     private void renderText(GraphicsContext gc, double x, double y, int fontSize, Paint textColor, TextAlignment alignment, String text){
         gc.setFill(textColor);
+        gc.setGlobalAlpha(1.0);
         gc.setFont(new Font("Times New Roman", fontSize));
         gc.setTextAlign(alignment);
         gc.fillText(text, x, y);
@@ -231,7 +234,9 @@ public class GameController {
                         );
                         shooter.update(bulletController, gameplayGroup);
                         bulletController.update();
-                        if(targetController.update(gameplayGroup, bulletController)){
+                        particleController.update(gameplayGC);
+
+                        if(targetController.update(gameplayGroup, bulletController, particleController)){
                             gameplay_background.getFadeOut().play();
                         }
                         break;

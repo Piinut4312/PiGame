@@ -70,14 +70,6 @@ public abstract class GameSprite {
         return v.distance(new Vec2d(this.x, this.y));
     }
 
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
     public boolean isAlive(){
         return !this.isDead;
     }
@@ -92,7 +84,7 @@ public abstract class GameSprite {
     }
 
     public double getRadian(){
-        return angle*(Math.PI/180.0);
+        return Math.toRadians(angle);
     }
 
     public void setScale(double scale) {

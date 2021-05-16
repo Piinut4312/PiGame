@@ -3,6 +3,7 @@ package pi_game;
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
+import javafx.scene.paint.Color;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class TargetController {
         this.spawn_timer = 0;
     }
 
-    public boolean update(Group group, BulletController bulletController){
+    public boolean update(Group group, BulletController bulletController, ParticleController particleController){
         spawn_timer++;
         if(spawn_timer >= SPAWN_RATE){
             ImageView targetImage = new ImageView(GameController.target_texture);
@@ -55,6 +56,7 @@ public class TargetController {
                         target.kill();
                         EXPLOSION_SOUND.play();
                         parent.gainScore();
+                        particleController.addParticleSystem(new ParticleSystem(16, target.getX(), target.getY(), 5, 10, 10, Color.ORANGE));
                         break;
                     }
                 }
