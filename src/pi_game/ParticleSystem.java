@@ -2,7 +2,6 @@ package pi_game;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -14,8 +13,6 @@ public class ParticleSystem {
     private ArrayList<ParticleSprite> particles;
     private Random rng = new Random();
     private boolean finished;
-
-
 
     public ParticleSystem(int amount, double x, double y, double vel, double size, int max_age, ArrayList<Color> colors, ParticleSystemProperties properties){
         this.amount = amount;

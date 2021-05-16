@@ -14,7 +14,6 @@ public class ParticleController {
         while(iter.hasNext()){
             ParticleSystem system = iter.next();
             system.update(gc);
-
             if(system.isFinished()){
                 iter.remove();
             }

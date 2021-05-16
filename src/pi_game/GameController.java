@@ -2,9 +2,7 @@ package pi_game;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -26,13 +24,6 @@ public class GameController {
     private ParticleController particleController;
     private int score;
     private GameState state;
-
-    public static Canvas startCanvas;
-    public static Canvas gameplayCanvas;
-    public static Canvas endCanvas;
-    public static GraphicsContext startGC;
-    public static GraphicsContext gameplayGC;
-    public static GraphicsContext endGC;
 
     public static ResourceLocation background_rl = new ResourceLocation("textures/background.jpg");
     public static ResourceLocation shooter_rl = new ResourceLocation("textures/shooter.png");
@@ -63,15 +54,121 @@ public class GameController {
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
 
-    private Group gameplayGroup = new Group();
-    private Group endGroup = new Group();
-    private Group startGroup = new Group();
-    private Group pauseGroup = new Group();
+    private SceneSprite startSceneSprite = new SceneSprite(){
+        @Override
+        public void init() {
 
-    private Scene gameplayScene;
-    private Scene endScene;
-    private Scene startScene;
-    private Scene pauseScene;
+            title.initFadeOut(1, 1.0, 0.0);
+            clickInfo.initFadeOut(1, 1.0, 0.0);
+            clickInfo.getFadeOut().setOnFinished(event -> state = GameState.GAMEPLAY);
+
+            title.initFadeIn(1, 0.0, 1.0);
+            clickInfo.initFadeIn(1, 0.0, 1.0);
+
+            start_background.setPos(CENTER_X, CENTER_Y);
+            title.setPos(CENTER_X, CENTER_Y-100);
+            clickInfo.setPos(CENTER_X, CENTER_Y+100);
+            this.getGroup().getChildren().addAll(start_background.getImageView(), title.getImageView(), clickInfo.getImageView());
+
+            title.getFadeIn().play();
+            clickInfo.getFadeIn().play();
+        }
+
+        @Override
+        public void update() {
+            this.getScene().setOnMouseClicked(event -> {
+                gameplay_background.getFadeIn().play();
+                PRESS_SOUND.play();
+                title.getFadeOut().play();
+                clickInfo.getFadeOut().play();
+            });
+        }
+    };
+
+    private SceneSprite gameplaySceneSprite = new SceneSprite(){
+        @Override
+        public void init() {
+            gameplay_background.setPos(CENTER_X, CENTER_Y);
+            gameplay_background.initFadeOut(0.3, 1.0, 0.0);
+            gameplay_background.initFadeIn(0.3, 0.0, 1.0);
+            gameplay_background.getFadeOut().setOnFinished(event -> state = GameState.END);
+
+            this.getGroup().getChildren().addAll(gameplay_background.getImageView(), shooter_image);
+
+            Circle circle = new Circle(CENTER_X, CENTER_Y, PiGame.RADIUS);
+            circle.setFill(Color.TRANSPARENT);
+            circle.setStroke(Color.AZURE);
+            circle.setStrokeWidth(2);
+            circle.toBack();
+            this.getGroup().getChildren().add(circle);
+
+            Circle smallCircle = new Circle(CENTER_X, CENTER_Y, 10);
+            smallCircle.setFill(Color.AZURE);
+            smallCircle.setStroke(Color.AZURE);
+            smallCircle.setStrokeWidth(2);
+            smallCircle.toBack();
+            this.getGroup().getChildren().add(smallCircle);
+
+            this.getGc().getCanvas().toFront();
+
+            this.getScene().setOnMouseMoved(
+                    event -> shooter.update(event.getX(), event.getY())
+            );
+
+            this.getScene().setCursor(Cursor.DEFAULT);
+        }
+
+        @Override
+        public void update() {
+            player.play();
+            this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
+            renderText(this.getGc(),800, 100, 32, Color.WHITE, TextAlignment.LEFT, "Score: "+score);
+            shooter.update(bulletController, this.getGroup());
+            bulletController.update();
+            if(targetController.update(this.getGroup(), bulletController, particleController)){
+                gameplay_background.getFadeOut().play();
+            }
+        }
+    };
+
+    private SceneSprite endSceneSprite = new SceneSprite(){
+        @Override
+        public void init() {
+
+            end_background.setPos(CENTER_X, CENTER_Y);
+
+            this.getGroup().getChildren().addAll(end_background.getImageView());
+
+            restart.setPos(CENTER_X, CENTER_Y+100);
+            restart.clicked(()->{
+                gameplay_background.getFadeIn().play();
+                PRESS_SOUND.play();
+                restart();
+                state = GameState.GAMEPLAY;
+            });
+
+            menu.setPos(CENTER_X, CENTER_Y+250);
+            menu.clicked(()->{
+                PRESS_SOUND.play();
+                restart();
+                title.getFadeIn().play();
+                clickInfo.getFadeIn().play();
+                state = GameState.START;
+            });
+
+            this.getScene().setOnMouseClicked(event -> particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 12, 12, 12, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3))));
+            this.getGroup().getChildren().addAll(restart.image.getImageView(), menu.image.getImageView());
+
+            end_background.getImageView().toBack();
+        }
+
+        @Override
+        public void update() {
+            player.stop();
+            this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
+            renderText(this.getGc(), CENTER_X, CENTER_Y-100, 56, Color.WHITE, TextAlignment.CENTER, "Final Score: "+score);
+        }
+    };
 
     private static AudioClip PRESS_SOUND = new AudioClip(press_sound_rl.fromFileToString());
 
@@ -88,9 +185,6 @@ public class GameController {
         particleController = new ParticleController();
         score = 0;
         state = GameState.START;
-        startScene = new Scene(startGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-        gameplayScene = new Scene(gameplayGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-        endScene = new Scene(endGroup, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         player.setVolume(0.3);
         PRESS_SOUND.setVolume(0.3);
     }
@@ -104,108 +198,27 @@ public class GameController {
     public Scene getScene(){
         switch(state){
             case START:
-                return this.startScene;
+                return startSceneSprite.getScene();
             case GAMEPLAY:
-                return this.gameplayScene;
+                return gameplaySceneSprite.getScene();
             case END:
-                return this.endScene;
+                return endSceneSprite.getScene();
             default:
-                return this.gameplayScene;
+                return null;
         }
     }
 
     public GraphicsContext getGC(){
         switch (state){
             case START:
-                return startGC;
+                return startSceneSprite.getGc();
             case GAMEPLAY:
-                return gameplayGC;
+                return gameplaySceneSprite.getGc();
             case END:
-                return endGC;
+                return endSceneSprite.getGc();
             default:
-                return endGC;
+                return null;
         }
-    }
-
-    private void initStartScene(){
-        startCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-        startGC = startCanvas.getGraphicsContext2D();
-        startGroup.getChildren().add(startCanvas);
-
-        title.initFadeOut(1, 1.0, 0.0);
-        clickInfo.initFadeOut(1, 1.0, 0.0);
-        clickInfo.getFadeOut().setOnFinished(event -> state = GameState.GAMEPLAY);
-
-        title.initFadeIn(1, 0.0, 1.0);
-        clickInfo.initFadeIn(1, 0.0, 1.0);
-
-        start_background.setPos(CENTER_X, CENTER_Y);
-        title.setPos(CENTER_X, CENTER_Y-100);
-        clickInfo.setPos(CENTER_X, CENTER_Y+100);
-        startGroup.getChildren().addAll(start_background.getImageView(), title.getImageView(), clickInfo.getImageView());
-
-        title.getFadeIn().play();
-        clickInfo.getFadeIn().play();
-    }
-
-    private void initGameplayScene(){
-        gameplayCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-        gameplayGC = gameplayCanvas.getGraphicsContext2D();
-
-        gameplay_background.setPos(CENTER_X, CENTER_Y);
-        gameplay_background.initFadeOut(0.3, 1.0, 0.0);
-        gameplay_background.initFadeIn(0.3, 0.0, 1.0);
-        gameplay_background.getFadeOut().setOnFinished(event -> state = GameState.END);
-
-        gameplayGroup.getChildren().addAll(gameplay_background.getImageView(), gameplayCanvas, shooter_image);
-
-        Circle circle = new Circle(CENTER_X, CENTER_Y, PiGame.RADIUS);
-        circle.setFill(Color.TRANSPARENT);
-        circle.setStroke(Color.AZURE);
-        circle.setStrokeWidth(2);
-        circle.toBack();
-        gameplayGroup.getChildren().add(circle);
-
-        Circle smallCircle = new Circle(CENTER_X, CENTER_Y, 10);
-        smallCircle.setFill(Color.AZURE);
-        smallCircle.setStroke(Color.AZURE);
-        smallCircle.setStrokeWidth(2);
-        smallCircle.toBack();
-        gameplayGroup.getChildren().add(smallCircle);
-
-        gameplayScene.setCursor(Cursor.DEFAULT);
-    }
-
-    private void initEndScene(){
-        endCanvas = new Canvas(PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-        endGC = endCanvas.getGraphicsContext2D();
-
-        end_background.setPos(CENTER_X, CENTER_Y);
-
-        endGroup.getChildren().addAll(end_background.getImageView(), endCanvas);
-
-        restart.setPos(CENTER_X, CENTER_Y+100);
-        restart.clicked(()->{
-            gameplay_background.getFadeIn().play();
-            PRESS_SOUND.play();
-            restart();
-            state = GameState.GAMEPLAY;
-        });
-
-        menu.setPos(CENTER_X, CENTER_Y+250);
-        menu.clicked(()->{
-            PRESS_SOUND.play();
-            restart();
-            title.getFadeIn().play();
-            clickInfo.getFadeIn().play();
-            state = GameState.START;
-        });
-
-        endScene.setOnMouseClicked(event ->{
-            particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 10, 12, 10, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3)));
-        });
-
-        endGroup.getChildren().addAll(restart.image.getImageView(), menu.image.getImageView());
     }
 
     public void gainScore(){
@@ -222,9 +235,9 @@ public class GameController {
 
     public void runGame(Stage stage){
 
-        initStartScene();
-        initGameplayScene();
-        initEndScene();
+        startSceneSprite.init();
+        gameplaySceneSprite.init();
+        endSceneSprite.init();
 
         new AnimationTimer(){
 
@@ -235,30 +248,13 @@ public class GameController {
 
                 switch(state){
                     case START:
-                        startScene.setOnMouseClicked(event -> {
-                            gameplay_background.getFadeIn().play();
-                            PRESS_SOUND.play();
-                            title.getFadeOut().play();
-                            clickInfo.getFadeOut().play();
-                        });
+                        startSceneSprite.update();
                         break;
                     case GAMEPLAY:
-                        player.play();
-                        gameplayGC.clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-                        renderText(gameplayGC,800, 100, 32, Color.WHITE, TextAlignment.LEFT, "Score: "+score);
-                        gameplayScene.setOnMouseMoved(
-                                event -> shooter.update(event.getX(), event.getY())
-                        );
-                        shooter.update(bulletController, gameplayGroup);
-                        bulletController.update();
-                        if(targetController.update(gameplayGroup, bulletController, particleController)){
-                            gameplay_background.getFadeOut().play();
-                        }
+                        gameplaySceneSprite.update();
                         break;
                     case END:
-                        player.stop();
-                        endGC.clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-                        renderText(endGC, CENTER_X, CENTER_Y-100, 56, Color.WHITE, TextAlignment.CENTER, "Final Score: "+score);
+                        endSceneSprite.update();
                         break;
                     default:
                         System.out.println("Who am I? Why am I here?");

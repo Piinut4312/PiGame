@@ -8,7 +8,7 @@ public class PiGame extends Application{
     public static double SCR_WIDTH = 1024;
     public static double SCR_HEIGHT = 768;
 
-    public static double RADIUS = 200;
+    public static double RADIUS = 210;
 
     GameController gameController = new GameController(40);
 
