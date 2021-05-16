@@ -1,11 +1,12 @@
-package pi_game;
+package pi_game.controllers;
 
 import javafx.scene.Group;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
-import javafx.scene.paint.Color;
+import pi_game.*;
+import pi_game.sprites.BulletSprite;
+import pi_game.sprites.TargetSprite;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 

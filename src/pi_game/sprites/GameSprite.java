@@ -1,11 +1,8 @@
-package pi_game;
+package pi_game.sprites;
 
 import com.sun.javafx.geom.Vec2d;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.transform.Rotate;
 
 public abstract class GameSprite {
     private ImageView texture;

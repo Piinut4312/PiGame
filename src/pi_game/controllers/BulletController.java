@@ -1,4 +1,6 @@
-package pi_game;
+package pi_game.controllers;
+
+import pi_game.sprites.BulletSprite;
 
 import java.util.ArrayList;
 

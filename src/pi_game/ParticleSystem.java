@@ -2,6 +2,7 @@ package pi_game;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import pi_game.sprites.ParticleSprite;
 
 import java.util.ArrayList;
 import java.util.Random;

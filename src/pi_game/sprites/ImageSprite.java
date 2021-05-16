@@ -1,9 +1,10 @@
-package pi_game;
+package pi_game.sprites;
 
 import javafx.animation.FadeTransition;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
+import pi_game.ResourceLocation;
 
 public class ImageSprite {
 

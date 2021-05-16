@@ -1,6 +1,7 @@
-package pi_game;
+package pi_game.controllers;
 
 import javafx.scene.canvas.GraphicsContext;
+import pi_game.ParticleSystem;
 
 import java.util.ArrayList;
 import java.util.Iterator;

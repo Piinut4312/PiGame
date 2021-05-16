@@ -1,4 +1,4 @@
-package pi_game;
+package pi_game.controllers;
 
 import javafx.animation.AnimationTimer;
 import javafx.scene.Cursor;
@@ -15,6 +15,11 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import pi_game.*;
+import pi_game.sprites.ButtonSprite;
+import pi_game.sprites.ImageSprite;
+import pi_game.sprites.SceneSprite;
+import pi_game.sprites.ShooterSprite;
 
 public class GameController {
 
@@ -157,7 +162,7 @@ public class GameController {
             });
 
             this.getScene().setOnMouseClicked(event -> particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 12, 12, 12, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3))));
-            this.getGroup().getChildren().addAll(restart.image.getImageView(), menu.image.getImageView());
+            this.getGroup().getChildren().addAll(restart.getImageView(), menu.getImageView());
 
             end_background.getImageView().toBack();
         }

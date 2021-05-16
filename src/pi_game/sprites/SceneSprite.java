@@ -1,9 +1,10 @@
-package pi_game;
+package pi_game.sprites;
 
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import pi_game.PiGame;
 
 public class SceneSprite {
 

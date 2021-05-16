@@ -2,6 +2,7 @@ package pi_game;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import pi_game.controllers.GameController;
 
 public class PiGame extends Application{
 

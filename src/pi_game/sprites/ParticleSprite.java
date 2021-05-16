@@ -1,4 +1,4 @@
-package pi_game;
+package pi_game.sprites;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Paint;

@@ -1,7 +1,8 @@
-package pi_game;
+package pi_game.sprites;
 
 import com.sun.javafx.geom.Vec2d;
 import javafx.scene.image.ImageView;
+import pi_game.PiGame;
 
 public class TargetSprite extends GameSprite{
 

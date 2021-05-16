@@ -1,14 +1,13 @@
-package pi_game;
+package pi_game.sprites;
 
 import com.sun.javafx.geom.Vec2d;
 import javafx.scene.Group;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.media.AudioClip;
-
-import java.io.File;
-import java.util.ArrayList;
+import pi_game.PiGame;
+import pi_game.ResourceLocation;
+import pi_game.controllers.BulletController;
+import pi_game.controllers.GameController;
 
 public class ShooterSprite extends GameSprite{
 
@@ -43,7 +42,7 @@ public class ShooterSprite extends GameSprite{
     }
 
     public Vec2d solveNewPos(double mouseX, double mouseY, double offset){
-        double dx = mouseX-PiGame.SCR_WIDTH/2;
+        double dx = mouseX- PiGame.SCR_WIDTH/2;
         double dy = mouseY-PiGame.SCR_HEIGHT/2;
         double size = Vec2d.distance(PiGame.SCR_WIDTH/2, PiGame.SCR_HEIGHT/2, mouseX, mouseY);
         double ratio = (PiGame.RADIUS +offset)/size;
