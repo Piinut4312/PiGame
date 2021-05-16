@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -43,6 +44,8 @@ public class GameController {
     public static ResourceLocation menu_hover_rl = new ResourceLocation("textures/menuHover.png");
     public static ResourceLocation play_button_rl = new ResourceLocation("textures/play.png");
     public static ResourceLocation play_hover_rl = new ResourceLocation("textures/playHover.png");
+    public static ResourceLocation setting_button_rl = new ResourceLocation("textures/setting.png");
+    public static ResourceLocation setting_hover_rl = new ResourceLocation("textures/settingHover.png");
 
     public static ResourceLocation press_sound_rl = new ResourceLocation("sounds/button_press.mp3");
     public static ResourceLocation gameplaybgm_rl = new ResourceLocation("sounds/gameplayBGM.mp3");
@@ -59,6 +62,7 @@ public class GameController {
     public ButtonSprite pause_restart = new ButtonSprite(restart_button_rl, restart_hovering_rl, 100, 100);
     public ButtonSprite pause_menu = new ButtonSprite(menu_button_rl, menu_hover_rl, 100, 100);
     public ButtonSprite pause_play = new ButtonSprite(play_button_rl, play_hover_rl, 100, 100);
+    public ButtonSprite start_setting = new ButtonSprite(setting_button_rl, setting_hover_rl, 100, 100);
 
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
@@ -66,7 +70,16 @@ public class GameController {
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
 
-    private SceneSprite startSceneSprite = new SceneSprite(){
+    private SceneSprite startSceneSprite = new SceneSprite(1, 1){
+
+        private void handleClicking(MouseEvent event){
+            particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 12, 12, 12, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3)));
+            gameplay_background.getFadeIn().play();
+            PRESS_SOUND.play();
+            title.getFadeOut().play();
+            clickInfo.getFadeOut().play();
+        }
+
         @Override
         public void init() {
 
@@ -82,18 +95,24 @@ public class GameController {
             clickInfo.setPos(CENTER_X, CENTER_Y+100);
             this.getGroup().getChildren().addAll(start_background.getImageView(), title.getImageView(), clickInfo.getImageView());
 
+            start_background.getImageView().toBack();
+
+            start_setting.setPos(800, 100);
+            this.getGroup().getChildren().add(start_setting.getImageView());
+
+            title.getImageView().setOnMouseClicked(event -> handleClicking(event));
+
+            clickInfo.getImageView().setOnMouseClicked(event -> handleClicking(event));
+
+           start_background.getImageView().setOnMouseClicked(event -> handleClicking(event));
+
             title.getFadeIn().play();
             clickInfo.getFadeIn().play();
         }
 
         @Override
         public void update() {
-            this.getScene().setOnMouseClicked(event -> {
-                gameplay_background.getFadeIn().play();
-                PRESS_SOUND.play();
-                title.getFadeOut().play();
-                clickInfo.getFadeOut().play();
-            });
+            this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
         }
     };
 
@@ -101,8 +120,8 @@ public class GameController {
         @Override
         public void init() {
             gameplay_background.setPos(CENTER_X, CENTER_Y);
-            gameplay_background.initFadeOut(0.3, 1.0, 0.0);
-            gameplay_background.initFadeIn(0.3, 0.0, 1.0);
+            gameplay_background.initFadeOut(0.3, 1.0, 0.4);
+            gameplay_background.initFadeIn(0.3, 0.4, 1.0);
             gameplay_background.getFadeOut().setOnFinished(event -> state = GameState.END);
 
             this.getGroup().getChildren().addAll(gameplay_background.getImageView(), shooter_image);
@@ -128,7 +147,10 @@ public class GameController {
             );
 
             this.getScene().setOnMouseClicked(
-                    event -> state = GameState.PAUSE
+                    event -> {
+                        state = GameState.PAUSE;
+                        player.pause();
+                    }
             );
 
             this.getScene().setCursor(Cursor.DEFAULT);
@@ -223,6 +245,7 @@ public class GameController {
             pause_restart.clicked(()->{
                 PRESS_SOUND.play();
                 gameplay_background.getFadeIn().play();
+                player.stop();
                 restart();
                 state = GameState.GAMEPLAY;
             });
@@ -233,6 +256,7 @@ public class GameController {
                 state = GameState.GAMEPLAY;
             });
 
+            this.getScene().setOnMouseClicked(event -> particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 12, 12, 12, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3))));
             this.getGroup().getChildren().addAll(frame, pause_restart.getImageView(), pause_menu.getImageView(), pause_play.getImageView());
 
             pause_background.getImageView().toBack();
@@ -240,7 +264,6 @@ public class GameController {
 
         @Override
         public void update() {
-            player.pause();
             this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
             renderText(this.getGc(), CENTER_X, CENTER_Y-175, 48, "Times New Roman", Color.WHITE, TextAlignment.CENTER, "Paused");
         }

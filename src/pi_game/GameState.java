@@ -4,5 +4,6 @@ public enum GameState {
     START,
     GAMEPLAY,
     PAUSE,
-    END
+    END,
+    SETTING
 }
