@@ -12,6 +12,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -40,6 +41,8 @@ public class GameController {
     public static ResourceLocation restart_hovering_rl = new ResourceLocation("textures/restartHover.png");
     public static ResourceLocation menu_button_rl = new ResourceLocation("textures/menu.png");
     public static ResourceLocation menu_hover_rl = new ResourceLocation("textures/menuHover.png");
+    public static ResourceLocation play_button_rl = new ResourceLocation("textures/play.png");
+    public static ResourceLocation play_hover_rl = new ResourceLocation("textures/playHover.png");
 
     public static ResourceLocation press_sound_rl = new ResourceLocation("sounds/button_press.mp3");
     public static ResourceLocation gameplaybgm_rl = new ResourceLocation("sounds/gameplayBGM.mp3");
@@ -49,9 +52,13 @@ public class GameController {
     public ImageSprite start_background = new ImageSprite(background_rl, 1200, 800);
     public ImageSprite gameplay_background = new ImageSprite(background_rl, 1200, 800);
     public ImageSprite end_background = new ImageSprite(background_rl, 1200, 800);
+    public ImageSprite pause_background = new ImageSprite(background_rl, 1200, 800);
 
-    public ButtonSprite restart = new ButtonSprite(restart_button_rl, restart_hovering_rl, 100, 100);
-    public ButtonSprite menu = new ButtonSprite(menu_button_rl, menu_hover_rl, 100, 100);
+    public ButtonSprite end_restart = new ButtonSprite(restart_button_rl, restart_hovering_rl, 100, 100);
+    public ButtonSprite end_menu = new ButtonSprite(menu_button_rl, menu_hover_rl, 100, 100);
+    public ButtonSprite pause_restart = new ButtonSprite(restart_button_rl, restart_hovering_rl, 100, 100);
+    public ButtonSprite pause_menu = new ButtonSprite(menu_button_rl, menu_hover_rl, 100, 100);
+    public ButtonSprite pause_play = new ButtonSprite(play_button_rl, play_hover_rl, 100, 100);
 
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
@@ -120,6 +127,10 @@ public class GameController {
                     event -> shooter.update(event.getX(), event.getY())
             );
 
+            this.getScene().setOnMouseClicked(
+                    event -> state = GameState.PAUSE
+            );
+
             this.getScene().setCursor(Cursor.DEFAULT);
         }
 
@@ -127,7 +138,7 @@ public class GameController {
         public void update() {
             player.play();
             this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-            renderText(this.getGc(),800, 100, 32, Color.WHITE, TextAlignment.LEFT, "Score: "+score);
+            renderText(this.getGc(),800, 100, 32, "Times New Roman", Color.WHITE, TextAlignment.LEFT, "Score: "+score);
             shooter.update(bulletController, this.getGroup());
             bulletController.update();
             if(targetController.update(this.getGroup(), bulletController, particleController)){
@@ -144,16 +155,16 @@ public class GameController {
 
             this.getGroup().getChildren().addAll(end_background.getImageView());
 
-            restart.setPos(CENTER_X, CENTER_Y+100);
-            restart.clicked(()->{
+            end_restart.setPos(CENTER_X, CENTER_Y+100);
+            end_restart.clicked(()->{
                 gameplay_background.getFadeIn().play();
                 PRESS_SOUND.play();
                 restart();
                 state = GameState.GAMEPLAY;
             });
 
-            menu.setPos(CENTER_X, CENTER_Y+250);
-            menu.clicked(()->{
+            end_menu.setPos(CENTER_X, CENTER_Y+250);
+            end_menu.clicked(()->{
                 PRESS_SOUND.play();
                 restart();
                 title.getFadeIn().play();
@@ -162,7 +173,7 @@ public class GameController {
             });
 
             this.getScene().setOnMouseClicked(event -> particleController.addParticleSystem(new ParticleSystem(8, event.getX(), event.getY(), 12, 12, 12, ParticleColors.CLICK, new ParticleSystemProperties(3, 3, 3))));
-            this.getGroup().getChildren().addAll(restart.getImageView(), menu.getImageView());
+            this.getGroup().getChildren().addAll(end_restart.getImageView(), end_menu.getImageView());
 
             end_background.getImageView().toBack();
         }
@@ -171,7 +182,67 @@ public class GameController {
         public void update() {
             player.stop();
             this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
-            renderText(this.getGc(), CENTER_X, CENTER_Y-100, 56, Color.WHITE, TextAlignment.CENTER, "Final Score: "+score);
+            renderText(this.getGc(), CENTER_X, CENTER_Y-100, 56, "Times New Roman", Color.WHITE, TextAlignment.CENTER, "Final Score: "+score);
+        }
+    };
+
+    private SceneSprite pauseSceneSprite = new SceneSprite(){
+
+        private int frameWidth = 400;
+        private int frameHeight = 600;
+        private int arcRadius = 40;
+
+        @Override
+        public void init() {
+            pause_background.setPos(CENTER_X, CENTER_Y);
+            this.getGroup().getChildren().add(pause_background.getImageView());
+
+            Rectangle frame = new Rectangle();
+            frame.setX(CENTER_X-frameWidth/2);
+            frame.setY(CENTER_Y-frameHeight/2);
+            frame.setWidth(frameWidth);
+            frame.setHeight(frameHeight);
+            frame.setArcWidth(arcRadius);
+            frame.setArcHeight(arcRadius);
+            frame.setFill(Color.TRANSPARENT);
+            frame.setStroke(Color.WHITE);
+            frame.setStrokeWidth(4);
+
+            pause_restart.setPos(CENTER_X, CENTER_Y+75);
+            pause_menu.setPos(CENTER_X, CENTER_Y+200);
+            pause_play.setPos(CENTER_X, CENTER_Y-50);
+
+            pause_menu.clicked(()->{
+                PRESS_SOUND.play();
+                restart();
+                title.getFadeIn().play();
+                clickInfo.getFadeIn().play();
+                state = GameState.START;
+            });
+
+            pause_restart.clicked(()->{
+                PRESS_SOUND.play();
+                gameplay_background.getFadeIn().play();
+                restart();
+                state = GameState.GAMEPLAY;
+            });
+
+            pause_play.clicked(()->{
+                PRESS_SOUND.play();
+                gameplay_background.getFadeIn().play();
+                state = GameState.GAMEPLAY;
+            });
+
+            this.getGroup().getChildren().addAll(frame, pause_restart.getImageView(), pause_menu.getImageView(), pause_play.getImageView());
+
+            pause_background.getImageView().toBack();
+        }
+
+        @Override
+        public void update() {
+            player.pause();
+            this.getGc().clearRect(0, 0, PiGame.SCR_WIDTH, PiGame.SCR_HEIGHT);
+            renderText(this.getGc(), CENTER_X, CENTER_Y-175, 48, "Times New Roman", Color.WHITE, TextAlignment.CENTER, "Paused");
         }
     };
 
@@ -198,6 +269,7 @@ public class GameController {
         targetController.restart();
         bulletController.restart();
         score = 0;
+        player.stop();
     }
 
     public Scene getScene(){
@@ -208,6 +280,8 @@ public class GameController {
                 return gameplaySceneSprite.getScene();
             case END:
                 return endSceneSprite.getScene();
+            case PAUSE:
+                return pauseSceneSprite.getScene();
             default:
                 return null;
         }
@@ -221,6 +295,8 @@ public class GameController {
                 return gameplaySceneSprite.getGc();
             case END:
                 return endSceneSprite.getGc();
+            case PAUSE:
+                return pauseSceneSprite.getGc();
             default:
                 return null;
         }
@@ -230,10 +306,10 @@ public class GameController {
         score++;
     }
 
-    private void renderText(GraphicsContext gc, double x, double y, int fontSize, Paint textColor, TextAlignment alignment, String text){
+    private void renderText(GraphicsContext gc, double x, double y, int fontSize, String font, Paint textColor, TextAlignment alignment, String text){
         gc.setFill(textColor);
         gc.setGlobalAlpha(1.0);
-        gc.setFont(new Font("Times New Roman", fontSize));
+        gc.setFont(new Font(font, fontSize));
         gc.setTextAlign(alignment);
         gc.fillText(text, x, y);
     }
@@ -243,6 +319,7 @@ public class GameController {
         startSceneSprite.init();
         gameplaySceneSprite.init();
         endSceneSprite.init();
+        pauseSceneSprite.init();
 
         new AnimationTimer(){
 
@@ -250,7 +327,6 @@ public class GameController {
             public void handle(long now) {
 
                 stage.setScene(getScene());
-
                 switch(state){
                     case START:
                         startSceneSprite.update();
@@ -261,14 +337,15 @@ public class GameController {
                     case END:
                         endSceneSprite.update();
                         break;
+                    case PAUSE:
+                        pauseSceneSprite.update();
+                        break;
                     default:
                         System.out.println("Who am I? Why am I here?");
                 }
                 particleController.update(getGC());
-
             }
         }.start();
-
         stage.show();
     }
 }
