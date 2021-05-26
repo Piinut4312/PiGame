@@ -34,7 +34,7 @@ public class GameController {
 
     public static ResourceLocation background_rl = new ResourceLocation("textures/background.jpg");
     public static ResourceLocation shooter_rl = new ResourceLocation("textures/shooter.png");
-    public static ResourceLocation bullet_rl = new ResourceLocation("textures/drop.png");
+    public static ResourceLocation bullet_rl = new ResourceLocation("textures/bullet.png");
     public static ResourceLocation target_rl = new ResourceLocation("textures/target.png");
     public static ResourceLocation title_rl = new ResourceLocation("textures/title.png");
     public static ResourceLocation click_info_rl = new ResourceLocation("textures/clickInfo.png");
@@ -100,11 +100,11 @@ public class GameController {
             start_setting.setPos(800, 100);
             this.getGroup().getChildren().add(start_setting.getImageView());
 
-            title.getImageView().setOnMouseClicked(event -> handleClicking(event));
+            title.getImageView().setOnMouseClicked(this::handleClicking);
 
-            clickInfo.getImageView().setOnMouseClicked(event -> handleClicking(event));
+            clickInfo.getImageView().setOnMouseClicked(this::handleClicking);
 
-           start_background.getImageView().setOnMouseClicked(event -> handleClicking(event));
+           start_background.getImageView().setOnMouseClicked(this::handleClicking);
 
             title.getFadeIn().play();
             clickInfo.getFadeIn().play();
