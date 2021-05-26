@@ -116,6 +116,10 @@ public class GameController {
         }
     };
 
+    public int getScore() {
+        return score;
+    }
+
     private SceneSprite gameplaySceneSprite = new SceneSprite(){
         @Override
         public void init() {

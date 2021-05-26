@@ -34,7 +34,7 @@ public class ShooterSprite extends GameSprite{
         if(shoot_timer >= 21){
             ImageView bulletImage = new ImageView(GameController.bullet_texture);
             group.getChildren().add(bulletImage);
-            bulletController.getBulletList().add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 10));
+            bulletController.getBulletList().add(new BulletSprite(bulletImage, this.getX(), this.getY(), 16, 16, this.getAngle(), 12));
             SHOOT_SOUND.play();
             this.shoot_timer = 0;
         }
