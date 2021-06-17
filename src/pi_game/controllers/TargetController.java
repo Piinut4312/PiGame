@@ -16,11 +16,12 @@ public class TargetController {
     private final int spawn_rate;
     private int cur_spawn_rate;
     private int spawn_timer;
+    private boolean isBombTriggered;
     private Random rng;
     private GameController parent;
     private int level = 0;
     private static final int max_level = 10;
-    private static int[] threshold = new int[]{10, 15, 25, 45, 70, 100, 160, 240, 320, 500};
+    private static int[] threshold = new int[]{20, 40, 60, 80, 100, 140, 180, 240, 320, 480};
 
     private static ResourceLocation explosion_sound_rl = new ResourceLocation("sounds/explosion.mp3");
     private static AudioClip EXPLOSION_SOUND = new AudioClip(explosion_sound_rl.fromFileToString());
@@ -32,6 +33,7 @@ public class TargetController {
         rng = new Random();
         this.parent = parent;
         EXPLOSION_SOUND.setVolume(0.1);
+        this.isBombTriggered = false;
     }
 
     public void restart(){
@@ -56,7 +58,7 @@ public class TargetController {
         }
         if(level < max_level && parent.getScore() >= threshold[level]){
             level++;
-            cur_spawn_rate -= 2;
+            cur_spawn_rate -= 3;
         }
         for(int i = 0; i < targets.size(); i++){
             TargetSprite target = targets.get(i);
@@ -74,11 +76,25 @@ public class TargetController {
                         break;
                     }
                 }
+                if(this.getIsBombTriggered()) {
+                    target.kill();
+                    particleController.addParticleSystem(new ParticleSystem(20, target.getX(), target.getY(), 15, 14, 24, ParticleColors.EXPLOSION, new ParticleSystemProperties(5, 4, 10)));
+                    parent.gainScore();
+                }
             }else{
                 targets.remove(i);
             }
         }
+        this.setIsBombTriggered(false);
         return false;
+    }
+
+    public void setIsBombTriggered(boolean b) {
+        isBombTriggered = b;
+    }
+
+    public boolean getIsBombTriggered() {
+        return isBombTriggered;
     }
 
 }

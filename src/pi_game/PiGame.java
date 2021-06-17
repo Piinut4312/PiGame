@@ -11,7 +11,7 @@ public class PiGame extends Application{
 
     public static double RADIUS = 210;
 
-    GameController gameController = new GameController(42);
+    GameController gameController = new GameController(48);
 
     public static void main(String[] args) {
         launch(args);

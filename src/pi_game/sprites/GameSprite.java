@@ -92,4 +92,7 @@ public abstract class GameSprite {
         this.angle = angle;
     }
 
+    public ImageView getTexture() {
+        return texture;
+    }
 }

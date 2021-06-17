@@ -27,6 +27,7 @@ public class GameController {
 
     private TargetController targetController;
     private BulletController bulletController;
+    private BombController bombController;
     private ShooterSprite shooter;
     private ParticleController particleController;
     private int score;
@@ -36,6 +37,7 @@ public class GameController {
     public static ResourceLocation shooter_rl = new ResourceLocation("textures/shooter.png");
     public static ResourceLocation bullet_rl = new ResourceLocation("textures/bullet.png");
     public static ResourceLocation target_rl = new ResourceLocation("textures/target.png");
+    public static ResourceLocation bomb_rl = new ResourceLocation("textures/bomb.png");
     public static ResourceLocation title_rl = new ResourceLocation("textures/title.png");
     public static ResourceLocation click_info_rl = new ResourceLocation("textures/clickInfo.png");
     public static ResourceLocation restart_button_rl = new ResourceLocation("textures/restart.png");
@@ -67,6 +69,8 @@ public class GameController {
     public static Image shooter_texture = new Image(shooter_rl.toString(), 32, 32, true, false);
     public static Image bullet_texture = new Image(bullet_rl.toString(), 16, 16, true, false);
     public static Image target_texture = new Image(target_rl.toString(), 16, 16, true, false);
+    public static Image bomb_texture = new Image(bomb_rl.toString(), 14, 14, true, false);
+
 
     public static ImageView shooter_image = new ImageView(shooter_texture);
 
@@ -167,6 +171,9 @@ public class GameController {
             renderText(this.getGc(),800, 100, 32, "Times New Roman", Color.WHITE, TextAlignment.LEFT, "Score: "+score);
             shooter.update(bulletController, this.getGroup());
             bulletController.update();
+            if(!bombController.update(this.getGroup(), bulletController, particleController)) {
+                targetController.setIsBombTriggered(true);
+            }
             if(targetController.update(this.getGroup(), bulletController, particleController)){
                 gameplay_background.getFadeOut().play();
             }
@@ -284,6 +291,7 @@ public class GameController {
     public GameController(int spawn_rate) {
         targetController = new TargetController(this, spawn_rate);
         bulletController = new BulletController();
+        bombController = new BombController(this, 12*spawn_rate);
         shooter = new ShooterSprite(shooter_image, CENTER_X, CENTER_Y, 32, 32);
         particleController = new ParticleController();
         score = 0;
@@ -295,6 +303,7 @@ public class GameController {
     public void restart(){
         targetController.restart();
         bulletController.restart();
+        bombController.restart();
         score = 0;
         player.stop();
     }
